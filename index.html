@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
+    <style>
+      body {
+        border: 1px solid black;
+        padding: 2em;
+        text-align: center;
+      }
+      h1 {
+      }
+      div {
+        width: 200px;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+      }
+      #principal {
+        background-color: yellow;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Monitorea la actividad de tu casa</h1>
+    <div>
+      <canvas id="myChart" height="400"></canvas>
+      <canvas id="myChart2" height="400"></canvas>
+      <canvas id="myChart3" height="400"></canvas>
+    </div>
+
+    
+
+    <script>
+      const ctx = document.getElementById("myChart");
+
+      const myChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Temperatura"],
+          datasets: [
+            {
+              label: "ºC",
+              data: [29],
+              borderWidth: 1,
+              borderColor: "rgb(255, 0, 0)",
+              backgroundColor: "rgb(197, 39, 39)",
+              barPercentage: 0.5,
+            },
+          ],
+        },
+
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 50, // Ajusta este valor según tus necesidades
+              ticks: {
+                stepSize: 5, // Asegúrate de incluir esto dentro de "ticks"
+              },
+            },
+          },
+        },
+      });
+
+      const ctx2 = document.getElementById("myChart2");
+
+      const myChart2 = new Chart(ctx2, {
+        type: "bar",
+        data: {
+          labels: ["Humedad"],
+          datasets: [
+            {
+              label: "% HR",
+              data: [45],
+              borderWidth: 1,
+              barPercentage: 0.5,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 80, // Ajusta este valor según tus necesidades
+              ticks: {
+                stepSize: 10, // Asegúrate de incluir esto dentro de "ticks"
+              },
+            },
+          },
+        },
+      });
+
+      const ctx3 = document.getElementById("myChart3");
+
+      const myChart3 = new Chart(ctx3, {
+        type: "bar",
+        data: {
+          labels: ["Energía"],
+          datasets: [
+            {
+              label: "kWh",
+              data: [60],
+              borderWidth: 1,
+              borderColor: "rgb(238, 255, 0)",
+              backgroundColor: "rgb(216, 186, 66)",
+              barPercentage: 0.5,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100, // Ajusta este valor según tus necesidades
+              ticks: {
+                stepSize:20, // Asegúrate de incluir esto dentro de "ticks"
+              },
+            },
+          },
+        },
+      });
+    </script>
+
+    <script>
+      const pusher = new Pusher(
+        "b912dae9a546050847b3", // Replace with 'key' from dashboard
+        {
+          cluster: "eu", // Replace with 'cluster' from dashboard
+          forceTLS: true,
+        }
+      );
+
+      const channel = pusher.subscribe("barra");
+      channel.bind("nuevaBarra", (data) => {
+        myChart.data.datasets[0].data[0] = data[0];
+        myChart2.data.datasets[0].data[0] = data[1];
+        myChart3.data.datasets[0].data[0] = data[2];
+        myChart.update();
+        myChart2.update();
+        myChart3.update();
+      });
+    </script>
+  </body>
+</html>
